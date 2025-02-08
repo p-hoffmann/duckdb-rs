@@ -404,7 +404,7 @@ impl Statement<'_> {
 
     /// Return ffi::duckdb_type for the parameter [index] of the statement.
     #[inline]
-    pub fn parameter_type(&self, index: u64) -> ffi::duckdb_type {
+    pub fn parameter_type(&self, index: usize) -> ffi::duckdb_type {
         self.stmt.bind_parameter_type(index)
     }
 

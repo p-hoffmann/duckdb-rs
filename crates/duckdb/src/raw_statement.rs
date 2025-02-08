@@ -317,7 +317,7 @@ impl RawStatement {
     }
 
     #[inline]
-    pub fn bind_parameter_type(&self, index: u64) -> ffi::duckdb_type {
+    pub fn bind_parameter_type(&self, index: usize) -> ffi::duckdb_type {
         unsafe { ffi::duckdb_param_type(self.ptr, index) }
     }
 
