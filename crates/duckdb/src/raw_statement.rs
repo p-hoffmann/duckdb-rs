@@ -5,6 +5,7 @@ use arrow::{
     datatypes::{DataType, Schema, SchemaRef},
     ffi::{from_ffi, FFI_ArrowArray, FFI_ArrowSchema},
 };
+use libduckdb_sys::duckdb_param_type;
 
 use super::{ffi, Result};
 #[cfg(feature = "polars")]
@@ -313,6 +314,11 @@ impl RawStatement {
     #[inline]
     pub fn bind_parameter_count(&self) -> usize {
         unsafe { ffi::duckdb_nparams(self.ptr) as usize }
+    }
+
+    #[inline]
+    pub fn bind_parameter_type(&self, index: u64) -> ffi::duckdb_type {
+        unsafe { ffi::duckdb_param_type(self.ptr, index) }
     }
 
     #[inline]

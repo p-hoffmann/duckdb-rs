@@ -402,6 +402,12 @@ impl Statement<'_> {
         self.stmt.bind_parameter_count()
     }
 
+    /// Return ffi::duckdb_type for the parameter [index] of the statement.
+    #[inline]
+    pub fn parameter_type(&self, index: u64) -> ffi::duckdb_type {
+        self.stmt.bind_parameter_type(index)
+    }
+
     /// Low level API to directly bind a parameter to a given index.
     ///
     /// Note that the index is one-based, that is, the first parameter index is
