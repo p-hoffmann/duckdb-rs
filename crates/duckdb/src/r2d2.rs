@@ -46,6 +46,14 @@ use std::{
     sync::{Arc, Mutex},
 };
 
+#[cfg(feature = "vscalar")]
+use crate::vscalar::VScalar;
+#[cfg(feature = "vscalar")]
+use std::fmt::Debug;
+
+#[cfg(feature = "vtab")]
+use crate::vtab::VTab;
+
 /// An `r2d2::ManageConnection` for `duckdb::Connection`s.
 pub struct DuckdbConnectionManager {
     connection: Arc<Mutex<Connection>>,
@@ -78,6 +86,23 @@ impl DuckdbConnectionManager {
             connection: Arc::new(Mutex::new(Connection::open_in_memory_with_flags(config)?)),
         })
     }
+
+    /// Register a table function.
+    #[cfg(feature = "vtab")]
+    pub fn register_table_function<T: VTab>(&self, name: &str) -> Result<()> {
+        let conn = self.connection.lock().unwrap();
+        conn.register_table_function::<T>(name)
+    }
+
+    /// Register a scalar function.
+    #[cfg(feature = "vscalar")]
+    pub fn register_scalar_function<S: VScalar>(&self, name: &str) -> Result<()>
+    where
+        S::State: Debug,
+    {
+        let conn = self.connection.lock().unwrap();
+        conn.register_scalar_function::<S>(name)
+    }
 }
 
 impl r2d2::ManageConnection for DuckdbConnectionManager {
@@ -90,7 +115,7 @@ impl r2d2::ManageConnection for DuckdbConnectionManager {
     }
 
     fn is_valid(&self, conn: &mut Self::Connection) -> Result<(), Self::Error> {
-        conn.execute_batch("").map_err(Into::into)
+        conn.execute_batch("")
     }
 
     fn has_broken(&self, _: &mut Self::Connection) -> bool {
